@@ -1,0 +1,58 @@
+# GardenStarter
+
+I am removing the DHT temperature and humidity sensor, since the RTC module (DS3231M) seems
+to have a built in temp sensor.  Although I lose out on humidity, I get to save a component,
+PCB space and also
+
+gain the possibility of switching to the ATTINY85 to save an Arduino Nano.  Although this
+may make reprogramming the chip a bit more difficult (an issues with I2C connection for
+the RTC and LCD), would be the better approach.
+
+I will continue working with the Nano for now and briefly test with the ATTiny to see
+if the switch would be worth it.
+
+Otherwise, here is the removed DHT code:
+
+
+
+#include "DHT.h"
+
+int DHTPIN   = 5;      //temperature and humidity sensor
+int DHTTYPE  = DHT11;  //sensor used is DHT11
+
+DHT dht(DHTPIN, DHTTYPE);      //temperature sensor object
+
+
+void temp_collection()
+{
+  // Reading temperature or humidity takes about 250 milliseconds!
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  float h = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float t = dht.readTemperature();
+  // Read temperature as Fahrenheit (isFahrenheit = true)
+  float f = dht.readTemperature(true);
+
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(h) || isnan(t) || isnan(f)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+
+  // Compute heat index in Fahrenheit (the default)
+  float hif = dht.computeHeatIndex(f, h);
+  // Compute heat index in Celsius (isFahreheit = false)
+  float hic = dht.computeHeatIndex(t, h, false);
+
+  Serial.print(F("Humidity: "));
+  Serial.print(h);
+  Serial.print(F("%  Temperature: "));
+  Serial.print(t);
+  Serial.print(F("°C "));
+  Serial.print(f);
+  Serial.print(F("°F  Heat index: "));
+  Serial.print(hic);
+  Serial.print(F("°C "));
+  Serial.print(hif);
+  Serial.println(F("°F"));
+}
